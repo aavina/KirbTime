@@ -1,0 +1,46 @@
+{
+    "appKeys": {},
+    "capabilities": [
+        ""
+    ],
+    "companyName": "aavina2@gmail.com",
+    "longName": "KirbTime",
+    "projectType": "native",
+    "resources": {
+        "media": [
+            {
+                "file": "images/kirbwalk2.png",
+                "name": "KIRB_WALK_2",
+                "type": "png"
+            },
+            {
+                "file": "images/kirbwalk1.png",
+                "name": "KIRB_WALK_1",
+                "type": "png"
+            },
+            {
+                "file": "images/kirbwalk0.png",
+                "name": "KIRB_WALK_0",
+                "type": "png"
+            },
+            {
+                "file": "images/kirb_menu.png",
+                "menuIcon": true,
+                "name": "MENU_ICON",
+                "type": "png"
+            },
+            {
+                "file": "images/kirb.png",
+                "name": "KIRB_ICON",
+                "type": "png"
+            }
+        ]
+    },
+    "shortName": "KirbTime",
+    "uuid": "0fe6692c-5192-41e3-9728-fb0edc61eea9",
+    "versionCode": 1,
+    "versionLabel": "1.0",
+    "watchapp": {
+        "watchface": true
+    }
+}
