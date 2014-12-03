@@ -2,10 +2,11 @@
 
 static Window *s_window;
 static TextLayer *s_text_layer;
+static TextLayer *s_battery_layer;
 static char s_buffer[] = "00:00";
 static InverterLayer *s_inv_layer;
-static GBitmap *s_kirb_bitmap, *s_kirbwalk0_bitmap, *s_kirbwalk1_bitmap, *s_kirbwalk2_bitmap;
-static BitmapLayer *s_kirb_layer, *s_kirbwalk0_layer, *s_kirbwalk1_layer, *s_kirbwalk2_layer;
+static GBitmap *s_kirbwalk0_bitmap, *s_kirbwalk1_bitmap, *s_kirbwalk2_bitmap;
+static BitmapLayer *s_kirbwalk0_layer, *s_kirbwalk1_layer, *s_kirbwalk2_layer;
 BitmapLayer **active_kirb;
 unsigned int active_frame = 0;
 
@@ -69,6 +70,17 @@ void tick_handler(struct tm *tick_time, TimeUnits units_changed) {
   text_layer_set_text(s_text_layer, s_buffer);
 }
 
+static void battery_handler(BatteryChargeState charge_state) {
+  static char s_battery_buffer[32];
+  
+  if(charge_state.is_charging) {
+    snprintf(s_battery_buffer, sizeof(s_battery_buffer), "charging");
+  } else {
+    snprintf(s_battery_buffer, sizeof(s_battery_buffer), "%d%% charged", charge_state.charge_percent);
+  }
+  text_layer_set_text(s_battery_layer, s_battery_buffer);
+}
+
 void window_load(Window *window) {
   s_text_layer = text_layer_create(GRect(0, 83, 132, 168));
   text_layer_set_background_color(s_text_layer, GColorClear);
@@ -78,21 +90,15 @@ void window_load(Window *window) {
   
   layer_add_child(window_get_root_layer(s_window), text_layer_get_layer(s_text_layer));
   
+  // Create battery layer
+  s_battery_layer = text_layer_create(GRect(0, 0, 144, 20));
+  text_layer_set_text_alignment(s_battery_layer, GTextAlignmentCenter);
+  layer_add_child(window_get_root_layer(s_window), text_layer_get_layer(s_battery_layer));
+  
   // Add inverter layer
   s_inv_layer = inverter_layer_create(GRect(0, 80, 144, 62));
   layer_add_child(window_get_root_layer(s_window), inverter_layer_get_layer(s_inv_layer));
   
-  /*
-  // Add kirb layer
-  s_kirb_bitmap = gbitmap_create_with_resource(RESOURCE_ID_KIRB_ICON);
-  s_kirb_layer = bitmap_layer_create(GRect(63, 60, 16, 16));
-  //bitmap_layer_set_bitmap(s_kirb_layer, s_kirb_bitmap);
-  //layer_add_child(window_get_root_layer(s_window), bitmap_layer_get_layer(s_kirb_layer));
-  
-  active_kirb = &s_kirb_layer;
-  bitmap_layer_set_bitmap(*active_kirb, s_kirb_bitmap);
-  layer_add_child(window_get_root_layer(s_window), bitmap_layer_get_layer(*active_kirb));
-  */
   // Mult kirb layers
   s_kirbwalk0_bitmap = gbitmap_create_with_resource(RESOURCE_ID_KIRB_WALK_0);
   s_kirbwalk0_layer = bitmap_layer_create(GRect(-16, 60, 16, 16));
@@ -121,11 +127,15 @@ void window_load(Window *window) {
   // Manually call the tick handler when window is done loading
   tick_handler(t, MINUTE_UNIT);
   
+  // Manually call battery handler
+  battery_handler(battery_state_service_peek());
+  
   // Start kirb moving
   timer = app_timer_register(delta, (AppTimerCallback) timer_callback, NULL);
 }
 
 void window_unload(Window *window) {
+  text_layer_destroy(s_battery_layer);
   text_layer_destroy(s_text_layer);
   
   inverter_layer_destroy(s_inv_layer);
@@ -157,6 +167,9 @@ void init() {
   
   // Subscribe to timer service
   tick_timer_service_subscribe(MINUTE_UNIT, (TickHandler) tick_handler);
+  
+  // Subscribe to battery handler
+  battery_state_service_subscribe(battery_handler);
 }
 
 void deinit() {
