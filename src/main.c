@@ -140,11 +140,6 @@ void window_unload(Window *window) {
   
   inverter_layer_destroy(s_inv_layer);
   
-  
-  //gbitmap_destroy(s_kirb_bitmap);
-  //bitmap_layer_destroy(s_kirb_layer);
-  //bitmap_layer_destroy(*active_kirb);
-  
   gbitmap_destroy(s_kirbwalk0_bitmap);
   gbitmap_destroy(s_kirbwalk1_bitmap);
   gbitmap_destroy(s_kirbwalk2_bitmap);

@@ -9,6 +9,11 @@
     "resources": {
         "media": [
             {
+                "file": "images/kirbscreen.png",
+                "name": "SCREENSHOT",
+                "type": "png"
+            },
+            {
                 "file": "images/kirbwalk2.png",
                 "name": "KIRB_WALK_2",
                 "type": "png"
